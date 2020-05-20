@@ -17,6 +17,17 @@
 
 /* Imports */
 var AWS = require('aws-sdk');
+var https = require('https');
+
+var agent = new https.Agent({ 
+    keepAlive: true,  
+    maxSockets: 25
+});
+AWS.config.update({   
+    httpOptions:{      
+        agent: agent   
+}});
+
 var LineStream = require('byline').LineStream;
 var parse = require('elb-log-parser');  // elb-log-parser  https://github.com/toshihirock/node-elb-log-parser
 var path = require('path');
@@ -25,7 +36,7 @@ var indexTimestamp = new Date().toISOString().replace(/\-/g, '.').replace(/T.+/,
 
 /* Globals */
 var esDomain = {
-    endpoint: 'elastic-search-domain-fs12fdwrdq2ahilw4zbrcocmmy.eu-west-1.es.amazonaws.com',
+    endpoint: 'vpc-prod-log-a-afaccaqevpuhbbocwfomltj45q.eu-west-1.es.amazonaws.com',
     region: 'eu-west-1',
     index: 'elblogs-' + indexTimestamp, // adds a timestamp to index. Example: elblogs-2016.03.31
     doctype: 'elb-access-logs'

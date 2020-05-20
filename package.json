@@ -4,16 +4,18 @@
   "version": "1.0.0",
   "maintainers": [
     {
-      "name": "Oleksandr Mykhalchuk",
-      "email": "mykhalchuk.oleksandr@gmail.com"
+      "name": "Tom Roffe",
+      "email": "tom.roffe@gmail.com"
     }
   ],
   "dependencies": {
-    "aws-sdk": "2.2.48",
+    "aws-sdk": "^2.680.0",
+    "buffer": "^4.9.2",
+    "byline": "4.2.1",
     "elb-log-parser": "0.0.2",
+    "https": "^1.0.0",
     "path": "0.12.7",
-    "stream": "0.0.2",
-    "byline": "4.2.1"
+    "stream": "0.0.2"
   },
   "repository": "https://github.com/blmr/aws-elb-logs-to-elasticsearch.git",
   "license": "Amazon Software License"
