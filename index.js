@@ -60,6 +60,7 @@ var numDocsAdded = 0;   // Number of log lines added to ES so far
  */
 var creds = new AWS.EnvironmentCredentials('AWS');
 
+console.log('Initializing AWS Lambda Function');
 /*
  * Get the log file from the given S3 bucket and key.  Parse it and add
  * each log record to the ES domain.
@@ -95,15 +96,15 @@ function postDocumentToES(doc, context) {
     var req = new AWS.HttpRequest(endpoint);
 
     req.method = 'POST';
-    req.path = path.join('/', esDomain.index, esDomain.doctype);
-    req.region = esDomain.region;
+    req.path = path.join('/', index, doctype);
+    req.region = region;
     req.body = doc;
     req.headers['presigned-expires'] = false;
     req.headers['Host'] = endpoint.host;
-
     // needed to make it work with ES 6.x
     // https://www.elastic.co/blog/strict-content-type-checking-for-elasticsearch-rest-requests
     req.headers['Content-Type'] = 'application/json';
+
     // Sign the request (Sigv4)
     var signer = new AWS.Signers.V4(req, 'es');
     signer.addAuthorization(creds, new Date());
