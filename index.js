@@ -34,14 +34,19 @@ var path = require('path');
 var stream = require('stream');
 var indexTimestamp = new Date().toISOString().replace(/\-/g, '.').replace(/T.+/, '');
 
-/* Globals */
-var esDomain = {
-    endpoint: 'vpc-prod-log-a-afaccaqevpuhbbocwfomltj45q.eu-west-1.es.amazonaws.com',
-    region: 'eu-west-1',
-    index: 'elblogs-' + indexTimestamp, // adds a timestamp to index. Example: elblogs-2016.03.31
-    doctype: 'elb-access-logs'
-};
-var endpoint =  new AWS.Endpoint(esDomain.endpoint);
+const esEndpoint = process.env['es_endpoint'];
+var endpoint = '';
+if (!esEndpoint) {
+  console.log('ERROR: Environment variable es_endpoint not set');
+} else {
+  endpoint =  new AWS.Endpoint(esEndpoint);
+}
+const region = process.env['region'] || 'eu-west-1';
+const indexPrefix = process.env['index'] || 'elblogs';
+const index = indexPrefix + '-' + indexTimestamp; // adds a timestamp to index. Example: elblogs-2016.03.31
+const doctype = process.env['doctype'] || 'elb-access-logs';
+
+
 var s3 = new AWS.S3();
 var totLogLines = 0;    // Total number of log lines in the file
 var numDocsAdded = 0;   // Number of log lines added to ES so far
@@ -96,6 +101,9 @@ function postDocumentToES(doc, context) {
     req.headers['presigned-expires'] = false;
     req.headers['Host'] = endpoint.host;
 
+    // needed to make it work with ES 6.x
+    // https://www.elastic.co/blog/strict-content-type-checking-for-elasticsearch-rest-requests
+    req.headers['Content-Type'] = 'application/json';
     // Sign the request (Sigv4)
     var signer = new AWS.Signers.V4(req, 'es');
     signer.addAuthorization(creds, new Date());
